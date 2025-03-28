@@ -68,4 +68,6 @@ void	sleep_philo(t_philo *philo, size_t time);
 void	think_philo(t_philo *philo, size_t time);
 int		check_death(t_philo *philo, size_t time);
 
+void	print_philo(char *message, t_philo *philo);
+
 #endif

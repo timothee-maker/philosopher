@@ -6,7 +6,7 @@
 /*   By: tnolent <tnolent@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 10:32:19 by tnolent           #+#    #+#             */
-/*   Updated: 2025/03/28 11:17:05 by tnolent          ###   ########.fr       */
+/*   Updated: 2025/03/28 13:42:43 by tnolent          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int	main(int ac, char **av)
 void	philo(int nb_philo, int die, int eat, int sleep, int times_eat)
 {
 	int				i;
-	t_philo 		philo[nb_philo + 1];
+	t_philo 		philo[nb_philo  + 1];
 	pthread_mutex_t forks[nb_philo];
 	pthread_t		observor;
 	t_program		program;
@@ -60,11 +60,11 @@ void	*monitor(void *arg)
 	size_t	time;
 
 	philo = (t_philo *)arg;
-	time = get_current_time();
+	philo->start_time = get_current_time();
 	// printf("%s num of philos %d %s\n", GREEN, philo[0].num_of_philos, NORMAL);
 	while (1)
 	{
-		if (check_death(philo, time))
+		if (!check_death(philo, time))
 		{
 			printf("monitor is cut\n");
 			break;
@@ -80,17 +80,27 @@ void	*philo_routine(void *arg)
 
 	time = get_current_time();
 	philo = (t_philo *)arg;
-	philo->start_time = get_current_time();
-	while (1)
+	while (*philo->dead != 1)
 	{
 		// printf("dead flag = %d\n", *philo->dead);
-		if (*philo->dead == 1)
-			break;
+		// if (*philo->dead == 1)
+			// break;
 		eat_philo(philo, time);
-		if (*philo->dead == 1)
-			break;
+		// if (*philo->dead == 1)
+		// 	break;
 		sleep_philo(philo, time);
 		think_philo(philo, time);
 	}
 	return (arg);
+}
+
+void	print_philo(char *message, t_philo *philo)
+{
+	size_t	time;
+
+	time = get_current_time() - philo->start_time;
+	// printf("current time : %zu, start time : %zu\n", get_current_time(), philo->start_time);
+	pthread_mutex_lock(philo->write_lock);
+	printf("%zu %d %s\n", time, philo->id, message);
+	pthread_mutex_unlock(philo->write_lock);	
 }

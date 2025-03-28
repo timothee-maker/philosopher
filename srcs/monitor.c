@@ -6,7 +6,7 @@
 /*   By: tnolent <tnolent@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 11:06:32 by tnolent           #+#    #+#             */
-/*   Updated: 2025/03/28 11:14:47 by tnolent          ###   ########.fr       */
+/*   Updated: 2025/03/28 13:58:37 by tnolent          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,22 +15,19 @@
 int	check_death(t_philo *philo, size_t time)
 {
 	int		i;
-	size_t	times_left;
+	size_t	time_without_eating;
 	size_t	tmp_time;
 
-	// printf("philo id : %d\n", philo[i++].id);
-	tmp_time = time;
-	time =  get_current_time() - tmp_time;
 	i = 0;
-	while (&philo[i])
+	while (i < philo[0].num_of_philos)
 	{
-		times_left = get_current_time() - philo->last_meal;
-		// printf("%zu philo : %d last meal : %zu time without eating : %zu\n", time, philo->id, philo->last_meal, time - philo->last_meal);
-		if (times_left > philo->time_to_die && philo->last_meal != 0)
+		time_without_eating = get_current_time() - philo[i].last_meal;
+		printf("%zu philo : %d last meal : %zu time without eating : %zu\n", time, philo[i].id, philo[i].last_meal, time - philo[i].last_meal);
+		if (time_without_eating > philo->time_to_die)
 		{
 			pthread_mutex_lock(philo->dead_lock);
 			*philo->dead = 1;
-			printf("%zu %d died\n", time, philo->id);
+			print_philo("died", &philo[i]);
 			pthread_mutex_unlock(philo->dead_lock);
 			return (0);
 		}
