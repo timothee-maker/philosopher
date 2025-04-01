@@ -40,6 +40,7 @@ typedef struct s_philo
 	pthread_mutex_t	*dead_lock;
 	pthread_mutex_t	*meal_lock;
 	pthread_mutex_t	*write_lock;
+	pthread_mutex_t	*variable_lock;
 }					t_philo;
 
 typedef struct s_program
@@ -48,13 +49,13 @@ typedef struct s_program
 	pthread_mutex_t	dead_lock;
 	pthread_mutex_t	meal_lock;
 	pthread_mutex_t	write_lock;
+	pthread_mutex_t	variable_lock;
 	t_philo			*philos;
 }					t_program;
 
 int 	ft_isdigit(int c);
 int 	ft_atoi(const char *str);
 void	parse_arg(int ac, char **av);
-
 void	*philo_routine(void *arg);
 void	*monitor(void *arg);
 void	philo(int nb_philo, int die, int eat, int sleep, int times_eat);
@@ -63,10 +64,11 @@ int		ft_usleep(size_t milliseconds);
 void	init_philo(t_program *program, t_philo *philo, int nb_philo, int die, int eat, int sleep, int position, pthread_mutex_t forks[]);
 void	init_program(t_program *program, t_philo *philo);
 void	init_mutex(t_philo *philo, pthread_mutex_t forks[], t_program *program);
-void	eat_philo(t_philo *philo, size_t time);
-void	sleep_philo(t_philo *philo, size_t time);
-void	think_philo(t_philo *philo, size_t time);
-int		check_death(t_philo *philo, size_t time);
+void	eat_philo(t_philo *philo);
+void	sleep_philo(t_philo *philo);
+void	think_philo(t_philo *philo);
+int		check_death(t_philo *philo);
+int		check_still_alive(t_philo *philo);
 
 void	print_philo(char *message, t_philo *philo);
 
