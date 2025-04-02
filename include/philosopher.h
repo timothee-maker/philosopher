@@ -9,18 +9,6 @@
 #include <time.h>
 #include <sys/time.h>
 
-# define NORMAL "\e[0m"
-# define YELLOW "\e[33m"
-# define BYELLOW "\e[1;33m"
-# define RED "\e[31m"
-# define GREEN "\e[32m"
-
-typedef struct s_counter
-{
-	pthread_mutex_t		count_mutex;
-	unsigned int		count;
-}						t_counter;
-
 typedef struct s_philo
 {
 	pthread_t		thread;
@@ -53,23 +41,30 @@ typedef struct s_program
 	t_philo			*philos;
 }					t_program;
 
+/*---LIBFT---*/
 int 	ft_isdigit(int c);
 int 	ft_atoi(const char *str);
+
+/*---PARSING---*/
 void	parse_arg(int ac, char **av);
+void	init_philo(t_program *program, t_philo *philo, char **av, int position, pthread_mutex_t forks[]);
+void	init_program(t_program *program, t_philo *philo);
+void	init_fork(t_philo *philo, int nb_philo, pthread_mutex_t *forks);
+
+
+/*---THREADS---*/
+void	philo(char **av, int nb_philo, int times_eat);
 void	*philo_routine(void *arg);
 void	*monitor(void *arg);
-void	philo(int nb_philo, int die, int eat, int sleep, int times_eat);
-size_t	get_current_time(void);
-int		ft_usleep(size_t milliseconds);
-void	init_philo(t_program *program, t_philo *philo, int nb_philo, int die, int eat, int sleep, int position, pthread_mutex_t forks[]);
-void	init_program(t_program *program, t_philo *philo);
-void	init_mutex(t_philo *philo, pthread_mutex_t forks[], t_program *program);
 void	eat_philo(t_philo *philo);
 void	sleep_philo(t_philo *philo);
 void	think_philo(t_philo *philo);
 int		check_death(t_philo *philo);
-int		check_still_alive(t_philo *philo);
 
+/*---UTILS---*/
+size_t	get_current_time(void);
+int		ft_usleep(size_t milliseconds);
+int		check_still_alive(t_philo *philo);
 void	print_philo(char *message, t_philo *philo);
 
 #endif

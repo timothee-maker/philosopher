@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo_test.c                                       :+:      :+:    :+:   */
+/*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tnolent <tnolent@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 10:32:19 by tnolent           #+#    #+#             */
-/*   Updated: 2025/04/01 16:51:36 by tnolent          ###   ########.fr       */
+/*   Updated: 2025/04/02 11:39:26 by tnolent          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@ int	main(int ac, char **av)
 	parse_arg(ac, av);
 	if (av[5])
 		times_eat = atoi(av[5]);
-	philo(atoi(av[1]), atoi(av[2]), atoi(av[3]), atoi(av[4]), times_eat);
+	philo(&av[1], atoi(av[1]), times_eat);
 }
 
-void	philo(int nb_philo, int die, int eat, int sleep, int times_eat)
+void	philo(char **av, int nb_philo, int times_eat)
 {
 	int				i;
 	t_philo 		philo[nb_philo + 1];
@@ -38,10 +38,11 @@ void	philo(int nb_philo, int die, int eat, int sleep, int times_eat)
 		philo[i].r_fork = &forks[(i + 1) % nb_philo];
 		i++;
 	}
+	// init_fork(nb_philo, forks);
 	i = 0;
 	while (i < nb_philo)
 	{
-		init_philo(&program, &philo[i], nb_philo, die, eat, sleep, i, forks);
+		init_philo(&program, &philo[i], av, i, forks);
 		i++;
 	}
 	init_program(&program, philo);
@@ -57,6 +58,7 @@ void	philo(int nb_philo, int die, int eat, int sleep, int times_eat)
 		pthread_join(philo[i++].thread, NULL);
 	pthread_join(observor, NULL);
 }
+
 
 void	*monitor(void *arg)
 {
@@ -94,7 +96,7 @@ void	print_philo(char *message, t_philo *philo)
 	if (!check_still_alive(philo))
 	{
 		pthread_mutex_lock(philo->write_lock);
-		printf("%zu %d %s\n", time, philo->id, message);
+		printf("%zu %d %s\e[0m\n", time, philo->id, message);
 		pthread_mutex_unlock(philo->write_lock);	
 	}
 }

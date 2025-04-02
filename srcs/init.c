@@ -6,7 +6,7 @@
 /*   By: tnolent <tnolent@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:36:53 by tnolent           #+#    #+#             */
-/*   Updated: 2025/04/01 15:00:32 by tnolent          ###   ########.fr       */
+/*   Updated: 2025/04/02 11:19:47 by tnolent          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,16 +23,14 @@ void	init_program(t_program *program, t_philo *philo)
 	// pthread_mutex_init(&program->variable_lock, NULL);
 }
 
-void	init_philo(t_program *program, t_philo *philo, int nb_philo, int die, int eat, int sleep, int position, pthread_mutex_t forks[])
+void	init_philo(t_program *program, t_philo *philo, char **av, int position, pthread_mutex_t forks[])
 {
-	// pthread_mutex_lock(&program->variable_lock);
 	philo->last_meal = get_current_time();
     philo->start_time = get_current_time();
-	// pthread_mutex_unlock(&program->variable_lock);
-	philo->num_of_philos = nb_philo;
-	philo->time_to_die = die;
-	philo->time_to_eat = eat;
-	philo->time_to_sleep = sleep;
+	philo->num_of_philos = atoi(av[0]);
+	philo->time_to_die = atoi(av[1]);
+	philo->time_to_eat = atoi(av[2]);
+	philo->time_to_sleep = atoi(av[3]);
 	philo->id = position + 1;
 	philo->dead = &program->dead_flag;
 	philo->write_lock = &program->write_lock;
@@ -44,5 +42,5 @@ void	init_philo(t_program *program, t_philo *philo, int nb_philo, int die, int e
 	philo[position].dead_lock = &program->dead_lock;
 	philo[position].write_lock = &program->write_lock;
 	philo[position].l_fork = &forks[position];
-	philo[position].r_fork = &forks[(position + 1) % nb_philo];
+	philo[position].r_fork = &forks[(position + 1) % atoi(av[1])];
 }
