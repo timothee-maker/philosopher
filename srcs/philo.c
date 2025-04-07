@@ -6,7 +6,7 @@
 /*   By: tnolent <tnolent@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 10:32:19 by tnolent           #+#    #+#             */
-/*   Updated: 2025/04/02 11:39:26 by tnolent          ###   ########.fr       */
+/*   Updated: 2025/04/07 15:02:06 by tnolent          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,51 +14,32 @@
 
 int	main(int ac, char **av)
 {
-	int	times_eat;
-
-	times_eat = 0;
 	parse_arg(ac, av);
-	if (av[5])
-		times_eat = atoi(av[5]);
-	philo(&av[1], atoi(av[1]), times_eat);
+	philo(&av[1]);
 }
 
-void	philo(char **av, int nb_philo, int times_eat)
+void	philo(char **av)
 {
 	int				i;
-	t_philo 		philo[nb_philo + 1];
-	pthread_mutex_t forks[nb_philo];
+	t_philo			philo[200];
+	pthread_mutex_t	forks[200];
 	pthread_t		observor;
 	t_program		program;
 
-	i = 0;
-	while (i < nb_philo)
-	{
-		philo[i].l_fork = &forks[i];
-		philo[i].r_fork = &forks[(i + 1) % nb_philo];
-		i++;
-	}
-	// init_fork(nb_philo, forks);
-	i = 0;
-	while (i < nb_philo)
-	{
-		init_philo(&program, &philo[i], av, i, forks);
-		i++;
-	}
-	init_program(&program, philo);
+	init_all(av, philo, forks, &program);
 	pthread_create(&observor, NULL, monitor, program.philos);
 	i = 0;
-	while (i < nb_philo)
+	while (i < atoi(av[0]))
 	{
-		pthread_create(&program.philos[i].thread, NULL, philo_routine, &program.philos[i]);
+		pthread_create(&program.philos[i].thread, NULL,
+			philo_routine, &program.philos[i]);
 		i++;
 	}
 	i = 0;
-	while (i < nb_philo)
+	while (i < atoi(av[0]))
 		pthread_join(philo[i++].thread, NULL);
 	pthread_join(observor, NULL);
 }
-
 
 void	*monitor(void *arg)
 {
@@ -68,7 +49,10 @@ void	*monitor(void *arg)
 	while (1)
 	{
 		if (!check_death(philo))
-			break;
+			break ;
+		if (!check_all_ate(philo))
+			break ;
+		usleep(1);
 	}
 	return (arg);
 }
@@ -76,27 +60,16 @@ void	*monitor(void *arg)
 void	*philo_routine(void *arg)
 {
 	t_philo	*philo;
-	size_t 	time;
 
 	philo = (t_philo *)arg;
 	while (!check_still_alive(philo))
 	{
-		eat_philo(philo);
+		if (philo->id % 2 == 0)
+			eat_philo_odd(philo);
+		else
+			eat_philo_even(philo);
 		sleep_philo(philo);
 		think_philo(philo);
 	}
 	return (arg);
-}
-
-void	print_philo(char *message, t_philo *philo)
-{
-	size_t	time;
-
-	time = get_current_time() - philo->start_time;
-	if (!check_still_alive(philo))
-	{
-		pthread_mutex_lock(philo->write_lock);
-		printf("%zu %d %s\e[0m\n", time, philo->id, message);
-		pthread_mutex_unlock(philo->write_lock);	
-	}
 }
